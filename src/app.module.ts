@@ -5,7 +5,6 @@ import { UsersModule } from './modules/users/users.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtGuard } from './common/guards/jwt.guard'
-import { JwtRefreshGuard } from './common/guards/jwt-refresh.guard'
 import { RolesGuard } from './common/guards/roles.guard'
 
 @Module({

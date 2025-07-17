@@ -16,6 +16,9 @@ model User {
   token String?
   role  Role    @default(USER)
 
+  accepted Task[] @relation("task_accepted")
+  authors  Task[] @relation("task_authors")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -85,4 +88,65 @@ model ClientInfo {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("clients_info")
+}
+
+model Task {
+  id          String           @id @default(uuid())
+  title       String           @db.VarChar(255)
+  description String           @db.Text
+  status      TaskStatus[]
+  priority    TaskPriorityEnum @default(LOW)
+
+  authorId String
+
+  author   User   @relation("task_authors", fields: [authorId], references: [id])
+  accepted User[] @relation("task_accepted")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("tasks")
+}
+
+model TaskStatus {
+  id String @id @default(uuid())
+
+  taskId  String         @map("task_id")
+  status  TaskStatusEnum
+  comment String?
+
+  task Task @relation(fields: [taskId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tasks_status")
+}
+
+enum TaskStatusEnum {
+  CREATED // Задача создана
+  CANCELLED // Отменена
+  SENT_FOR_DISCUSSION // Отправлена на обсуждение
+  UNDER_DISCUSSION // В процессе обсуждения
+  REJECTED // Отклонена
+  ACCEPTED // Принята в работу
+  IN_PROGRESS // Выполняется
+  EXECUTED // Выполнена
+  SENT_FOR_CHECKING // Отправлена на проверку
+  ON_VERIFICATION // Проверяется
+  SENT_FOR_REVISION // На доработке
+  REWORKING // В доработке
+  COMPLETED // Завершена
+  CLOSED // Закрыта
+  BLOCKED // Заблокирована
+  DELAYED // Отложена
+}
+
+enum TaskPriorityEnum {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+  ON_FREE_TIME
 }
